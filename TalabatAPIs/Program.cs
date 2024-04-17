@@ -1,38 +1,61 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using TalabatAPIs;
 using Talabat.Repository.Data;
+using Talabat.Repository;
 
 
-namespace TalabatAPIs
+namespace Talabat.APIs
 {
     public class Program
     {
-        public static void Main(string[] args)
+        // Entry Point
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            
+            // Add services to the container.
 
-            builder.Services.AddDbContext<StoreContext>(options =>
+            builder.Services.AddControllers();
+           
+
+
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddDbContext<StoreContext>(Optins =>
             {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+                Optins.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-
 
             var app = builder.Build();
 
+            using var Scope = app.Services.CreateScope();
+            var Services = Scope.ServiceProvider;
+            var _dbContext = Services.GetRequiredService<StoreContext>();
+            //Ask CLR To Create Object From DbContext Explicitly
+            var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+            try
+            {
+                await _dbContext.Database.MigrateAsync(); //Update DataBase
+            }
+            catch (Exception ex)
+            {
+                var logger = loggerFactory.CreateLogger<Program>();
+                logger.LogError(ex, "an error has been occured during apply the migration");
+            }
+
             // Configure the HTTP request pipeline.
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
 
+
             app.UseHttpsRedirection();
 
-           // app.UseAuthorization();
+            app.UseAuthorization();
 
 
             app.MapControllers();
@@ -41,3 +64,4 @@ namespace TalabatAPIs
         }
     }
 }
+
