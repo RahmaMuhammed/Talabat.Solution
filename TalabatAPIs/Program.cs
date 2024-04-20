@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Talabat.Repository.Data;
 using Talabat.Repository;
-using Talabat.Repository.Data.DataSeeding;
 
 
 namespace Talabat.APIs
@@ -34,17 +33,17 @@ namespace Talabat.APIs
             var Services = Scope.ServiceProvider;
             var _dbContext = Services.GetRequiredService<StoreContext>();
             //Ask CLR To Create Object From DbContext Explicitly
-            var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
-            try
-            {
-                await _dbContext.Database.MigrateAsync(); //Update DataBase
-                await StoreContextSeed.SeedAsync(_dbContext); //DataSeeding
+           var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+           try
+           {
+               await _dbContext.Database.MigrateAsync(); //Update DataBase
+                await StoreContextSeed.SeedAsync(_dbContext); //DataSeedin
             }
-            catch (Exception ex)
-            {
-                var logger = loggerFactory.CreateLogger<Program>();
-                logger.LogError(ex, "an error has been occured during apply the migration");
-            }
+           catch (Exception ex)
+           {
+               var logger = loggerFactory.CreateLogger<Program>();
+               logger.LogError(ex, "an error has been occured during apply the migration");
+           }
 
             // Configure the HTTP request pipeline.
 
