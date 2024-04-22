@@ -7,6 +7,7 @@ using Talabat.Core.Repositories.Contract;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Talabat.APIs.Errors;
+using Talabat.APIs.Middlewares;
 
 
 namespace Talabat.APIs
@@ -58,36 +59,38 @@ namespace Talabat.APIs
             #endregion
             using var Scope = app.Services.CreateScope();
             var Services = Scope.ServiceProvider;
-    var _dbContext = Services.GetRequiredService<StoreContext>();
-    //Ask CLR To Create Object From DbContext Explicitly
-    var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
-           try
-           {
-               await _dbContext.Database.MigrateAsync(); //Update DataBase
-    await StoreContextSeed.SeedAsync(_dbContext); //DataSeedin
-}
-           catch (Exception ex)
-           {
-               var logger = loggerFactory.CreateLogger<Program>();
-logger.LogError(ex, "an error has been occured during apply the migration");
-           }
+            var _dbContext = Services.GetRequiredService<StoreContext>();
+            //Ask CLR To Create Object From DbContext Explicitly
+            var loggerFactory = Services.GetRequiredService<ILoggerFactory>();
+            try
+            {
+                await _dbContext.Database.MigrateAsync(); //Update DataBase
+                await StoreContextSeed.SeedAsync(_dbContext); //DataSeedin
+            }
+            catch (Exception ex)
+            {
+                var logger = loggerFactory.CreateLogger<Program>();
+                logger.LogError(ex, "an error has been occured during apply the migration");
+            }
+
+            app.UseMiddleware<ExeptionMiddleware>();
 
             // Configure the HTTP request pipeline.
 
             if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
 
-app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+            app.UseStaticFiles();
 
-app.MapControllers();
+            app.MapControllers();
 
-app.Run();
+            app.Run();
         }
     }
 }
