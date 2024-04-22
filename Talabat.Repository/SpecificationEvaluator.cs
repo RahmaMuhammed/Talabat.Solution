@@ -23,9 +23,9 @@ namespace Talabat.Repository
             // p => p.Brand
             // p => p.Category
 
-            Spec.Include.Aggregate(query, (currentQuery, includeExpression) => currentQuery.Include(includeExpression));
-
+            query = Spec.Include.Aggregate(query, (currentQuery, includeExpression) => currentQuery.Include(includeExpression));
             return query;
+
         }
     }
 }
