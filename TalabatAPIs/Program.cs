@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Middlewares;
+using Talabat.APIs.Extentions;
+using Talabat.APIs.Extensions;
 
 
 namespace Talabat.APIs
@@ -19,44 +21,21 @@ namespace Talabat.APIs
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #region Configure Services
             // Add services to the container.
 
             builder.Services.AddControllers();
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerServices();
 
             builder.Services.AddDbContext<StoreContext>(Optins =>
             {
                 Optins.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
-            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
-            //   builder.Services.AddAutoMapper(M => M.AddProfile(new MappingProfile()));
-            builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-            builder.Services.Configure<ApiBehaviorOptions>(options =>
-            {
-                options.InvalidModelStateResponseFactory = (ActionContext) =>
-                {
-                    var errors = ActionContext.ModelState.Where(P => P.Value.Errors.Count > 0)
-                                                         .SelectMany(P => P.Value.Errors)
-                                                         .Select(E => E.ErrorMessage)
-                                                         .ToList();
-
-                    var Response = new ApiValidationErrorResponse()
-                    {
-                        Errors = errors
-                    };
-                    return new BadRequestObjectResult(Response);
-
-                };
-            });
+            //  ApplicationServicesExtension.AddAplicationServices(builder.Services);
+            builder.Services.AddAplicationServices();
 
             var app = builder.Build();
-            #endregion
             using var Scope = app.Services.CreateScope();
             var Services = Scope.ServiceProvider;
             var _dbContext = Services.GetRequiredService<StoreContext>();
@@ -79,8 +58,7 @@ namespace Talabat.APIs
 
             if (app.Environment.IsDevelopment())
             {
-                app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerMiddleware();
             }
 
             app.UseStatusCodePagesWithReExecute("/errors/{0}");
