@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Talabat.APIs.Dtos;
+using Talabat.APIs.Errors;
 using Talabat.Core.Entities;
 using Talabat.Core.Repositories.Contract;
 using Talabat.Core.Specifications;
@@ -30,13 +31,16 @@ namespace TalabatAPIs.Controllers
             return Ok(_mapper.Map<IEnumerable<Product>,IEnumerable<ProductToReturnDto>>(products));
         }
 
+
+        [ProducesResponseType(typeof(ProductToReturnDto), 200)]
+        [ProducesResponseType(typeof(ApiResponse), 404)]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductToReturnDto>> GetProduct(int id)
         {
             var Spec = new ProductWithBrandAndCategorySpecifications(id);
             var product = await _productsRepo.GetWithSpecAsync(Spec);
             if (product is null)
-                return NotFound(new { Message = "Not Found", StatusCode = 404 }); //404
+                return NotFound(new ApiResponse(404)); //404
             return Ok(_mapper.Map<Product , ProductToReturnDto>(product)); //200
         }
 
