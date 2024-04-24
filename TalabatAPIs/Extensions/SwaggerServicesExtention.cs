@@ -20,7 +20,7 @@ namespace Talabat.APIs.Extensions
         public static void UseSwaggerMiddleware(this WebApplication app)
         {
             app.UseSwagger();
-            //app.UseSwaggerUI();
+            app.UseSwaggerUI();
         }
 
 
