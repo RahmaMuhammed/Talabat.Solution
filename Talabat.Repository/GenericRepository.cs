@@ -19,14 +19,14 @@ namespace Talabat.Repository
         {
             _dbContext = dbContext;
         }
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IReadOnlyList<T>> GetAllAsync()
         {
-            if (typeof(T) == typeof(Product))
-                return (IEnumerable<T>)await _dbContext.Set<Product>().Include(p => p.Brand).Include(P => P.Category).ToListAsync();
+             // if (typeof(T) == typeof(Product))
+            //  return (IReadOnlyList<T>)await _dbContext.Set<Product>().skip(20).take(10).Include(p => p.Brand).Include(P => P.Category).ToListAsync();
             return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAllWithSpecAsync(ISpecifications<T> Spec)
+        public async Task<IReadOnlyList<T>> GetAllWithSpecAsync(ISpecifications<T> Spec)
         {
             return await ApplySpecification(Spec).AsNoTracking().ToListAsync(); ;
         }
@@ -36,6 +36,11 @@ namespace Talabat.Repository
             if (typeof(T) == typeof(Product))
                 return await _dbContext.Set<Product>().Where(P => P.Id == id).Include(p => p.Brand).Include(P => P.Category).FirstOrDefaultAsync() as T;
             return await _dbContext.Set<T>().FindAsync(id);
+        }
+
+        public async Task<int> GetCountAsync(ISpecifications<T> Spec)
+        {
+            return await ApplySpecification(Spec).CountAsync();
         }
 
         public async Task<T?> GetWithSpecAsync(ISpecifications<T> Spec)
