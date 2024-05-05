@@ -21,8 +21,8 @@ namespace Talabat.Repository
         }
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
-            if (typeof(T) == typeof(Product))
-                return (IReadOnlyList<T>)await _dbContext.Set<Product>().Include(p => p.Brand).Include(P => P.Category).ToListAsync();
+             // if (typeof(T) == typeof(Product))
+            //  return (IReadOnlyList<T>)await _dbContext.Set<Product>().skip(20).take(10).Include(p => p.Brand).Include(P => P.Category).ToListAsync();
             return await _dbContext.Set<T>().AsNoTracking().ToListAsync();
         }
 

@@ -10,18 +10,18 @@ namespace Talabat.Core.Specifications.ProductSpecs
     public class ProductWithBrandAndCategorySpecifications : BaseSpecifications<Product>
     {
         // This Constractor Will Be Used For Creating an Object, That will be used to Get All Products 
-        public ProductWithBrandAndCategorySpecifications(string? Sort, int? brandId, int? categoryId)
+        public ProductWithBrandAndCategorySpecifications(ProductSpecParams specParams)
             : base( p =>
-                      (!brandId.HasValue || p.BrandId == brandId.Value)&&
-                      (!categoryId.HasValue || p.CategoryId == categoryId.Value)
+                      (!specParams.brandId.HasValue || p.BrandId == specParams.brandId.Value)&&
+                      (!specParams.categoryId.HasValue || p.CategoryId == specParams.categoryId.Value)
             )
         {
             Include.Add(P => P.Brand);
             Include.Add(P => P.Category);
 
-            if (!string.IsNullOrEmpty(Sort))
+            if (!string.IsNullOrEmpty(specParams.sort))
             {
-                switch (Sort)
+                switch (specParams.sort)
                 {
                     case "priceAsc":
                         //   OrderBy = p => p.Price;
@@ -42,7 +42,10 @@ namespace Talabat.Core.Specifications.ProductSpecs
             else 
                 AddOrderBy(p => p.Name);
 
+            ApplyPagination((specParams.PageIndex - 1) * specParams.PageSize,specParams.PageSize);
+
         }
+
 
         // This Constractor Will Be Used For Creating an Object, That will be used to Get a Spacific Product With ID 
         public ProductWithBrandAndCategorySpecifications(int id) : base(P => P.Id == id)

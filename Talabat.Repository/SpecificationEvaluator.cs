@@ -23,6 +23,9 @@ namespace Talabat.Repository
             else if(Spec.OrderByDesc is not null) 
                 query = query.OrderByDescending(Spec.OrderByDesc);
 
+            if(Spec.IsPaginationEnable)
+                query = query.Skip(Spec.Skip).Take(Spec.Take);
+
             // query = _dpContext.Set<Product>().Where(p => p.Id == 1)
             // include expression
             // p => p.Brand
