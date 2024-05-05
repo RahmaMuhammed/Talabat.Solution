@@ -12,6 +12,7 @@ namespace Talabat.Core.Specifications.ProductSpecs
         // This Constractor Will Be Used For Creating an Object, That will be used to Get All Products 
         public ProductWithBrandAndCategorySpecifications(ProductSpecParams specParams)
             : base( p =>
+                      (string.IsNullOrEmpty(specParams.Search) || (p.Name.ToLower().Contains(specParams.Search)))&&
                       (!specParams.brandId.HasValue || p.BrandId == specParams.brandId.Value)&&
                       (!specParams.categoryId.HasValue || p.CategoryId == specParams.categoryId.Value)
             )
