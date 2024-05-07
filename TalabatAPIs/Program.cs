@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Talabat.Repository.Data;
+using Talabat.Repository.Generic_Repository.Data;
 using Talabat.Repository;
 using Talabat.APIs.Helpers;
 using Talabat.Core.Entities;
