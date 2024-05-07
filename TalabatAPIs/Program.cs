@@ -10,6 +10,7 @@ using Talabat.APIs.Errors;
 using Talabat.APIs.Middlewares;
 using Talabat.APIs.Extentions;
 using Talabat.APIs.Extensions;
+using StackExchange.Redis;
 
 
 namespace Talabat.APIs
@@ -34,6 +35,12 @@ namespace Talabat.APIs
 
             //  ApplicationServicesExtension.AddAplicationServices(builder.Services);
             builder.Services.AddAplicationServices();
+
+            builder.Services.AddScoped<IConnectionMultiplexer>((servicesProvider) =>
+            {
+                var connection = builder.Configuration.GetConnectionString("redis");
+                return ConnectionMultiplexer.Connect("connection");
+            });
 
             var app = builder.Build();
             using var Scope = app.Services.CreateScope();
